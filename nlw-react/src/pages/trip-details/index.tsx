@@ -1,14 +1,35 @@
-import { Calendar, CircleCheck, CircleDashed, Link2, MapPin, Plus, Settings2, Tag, UserCog, X } from "lucide-react"
-import { useState } from "react";
+import { Calendar, Plus, Tag, X } from "lucide-react"
+import { useEffect, useState } from "react";
 import { ImportantLinks } from "./important-links";
 import { Convidados } from "./convidados";
 import { Activities } from "./activities";
 import { DestinationAndDateHeader } from "./destination-and-date-header";
 import { Button } from "../../components/button";
+import { useParams } from "react-router-dom";
+import { api } from "../../lib/axios";
+
+interface Participants {
+    id: string,
+    name: string ,
+    email: string,
+    is_confirmed: boolean,
+    is_owner: boolean,
+    trip_id: string
+}
+interface Trip {
+    id: string,
+    destination: string,
+    starts_at: string,
+    ends_at: string,
+    is_confirmed: boolean,
+    participant: Participants[] | undefined
+}
+
 export function TripDetailsPage() {
+    const { trip_id } = useParams();
 
     const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
-
+    const [tripInfo, setTripInfo] = useState<Trip | undefined>()
     function openCreateActivityModal() {
         setIsCreateActivityModalOpen(true);
     }
@@ -16,15 +37,21 @@ export function TripDetailsPage() {
         setIsCreateActivityModalOpen(false);
     }
 
+    useEffect(() => {
+        api.get(`/trip/${trip_id}`).then((r) => {
+            setTripInfo(r.data.trip)
+        })
+    }, [trip_id])
+
     return (
         <div className="max-w-6xl px-6 py-10 mx-auto space-y-8 ">
-            <DestinationAndDateHeader />
+            <DestinationAndDateHeader tripInfo={tripInfo} />
             <main className="flex gap-16 px-4">
                 <Activities openCreateActivityModal={openCreateActivityModal} />
 
                 <div className="w-80 space-y-6">
                     <ImportantLinks />
-                    <Convidados />
+                    <Convidados tripInfo={tripInfo}/>
                 </div>
             </main>
 

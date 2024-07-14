@@ -1,5 +1,5 @@
 import { Calendar, Plus, Tag, X } from "lucide-react"
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ImportantLinks } from "./important-links";
 import { Convidados } from "./convidados";
 import { Activities } from "./activities";
@@ -10,7 +10,7 @@ import { api } from "../../lib/axios";
 
 interface Participants {
     id: string,
-    name: string ,
+    name: string,
     email: string,
     is_confirmed: boolean,
     is_owner: boolean,
@@ -37,6 +37,23 @@ export function TripDetailsPage() {
         setIsCreateActivityModalOpen(false);
     }
 
+
+    function createActivity(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget)
+
+        const title = data.get('atividade')?.toString()
+        const occours_at = data.get('occours_at')?.toString()
+
+        api.post(`/trip/${trip_id}/activities`,{
+            title,
+            occours_at
+        })
+
+        closeCreateActivityModal()
+        window.document.location.reload()
+    }
+
     useEffect(() => {
         api.get(`/trip/${trip_id}`).then((r) => {
             setTripInfo(r.data.trip)
@@ -51,7 +68,7 @@ export function TripDetailsPage() {
 
                 <div className="w-80 space-y-6">
                     <ImportantLinks />
-                    <Convidados tripInfo={tripInfo}/>
+                    <Convidados tripInfo={tripInfo} />
                 </div>
             </main>
 
@@ -71,7 +88,7 @@ export function TripDetailsPage() {
                                 </p>
                             </div>
 
-                            <form onSubmit={() => { }} className="space-y-3">
+                            <form onSubmit={createActivity} className="space-y-3">
                                 <div className="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
                                     <Tag className="text-zinc-400 size-5" />
                                     <input
@@ -87,7 +104,7 @@ export function TripDetailsPage() {
                                         <Calendar className="text-zinc-400 size-5" />
                                         <input
                                             type="datetime-local"
-                                            name="occurs_at"
+                                            name="occours_at"
                                             placeholder="Data e horário da atividade"
                                             className="flex-1 bg-transparent text-lg placeholder-zinc-400 outline-none"
                                         />

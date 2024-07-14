@@ -39,7 +39,7 @@ export function Convidados({ tripInfo }: Convidados) {
                     return (
                         <div key={i} className="flex items-center justify-between gap-4">
                             <div className="space-y-1.5">
-                                <span className="block font-medium text-zinc-100">Gabriel</span>
+                                <span className="block font-medium text-zinc-100">{c.name??`Convidado ${i}`}</span>
                                 <span className="block text-sm text-zinc-400 truncate">
                                     {c.email}
                                 </span>
